@@ -1,5 +1,4 @@
-# wiki3drank
-Wiki3DRank Calculator
+# Wiki3DRank Calculator
 
 Files
 =====
