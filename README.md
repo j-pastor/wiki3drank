@@ -44,7 +44,9 @@ Python scripts can also be run from the command line.
 
 Authors
 =======
-Juan-Antonio Pastor-Sánchez (University of Murcia, Spain)
-Tomás Saorín (University of Murcia, Spain)
+* Juan-Antonio Pastor-Sánchez (University of Murcia, Spain)
+* Tomás Saorín (University of Murcia, Spain)
 
+License
+=======
 Wiki3DRAnk Calculation is distribuited under GNU General Public LIcense v3.0
