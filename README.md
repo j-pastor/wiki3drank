@@ -1,7 +1,7 @@
 # wiki3drank
 Wiki3DRank Calculator
 
-FILES
+Files
 =====
 
 The Wiki3DRank calculation requires the following files:
@@ -24,14 +24,14 @@ PHP scripts require the JSON module to be installed (common on almost all server
 
 
 
-INSTALLATION
+Installation
 ============
 Simply upload the files to the server, give the wikipedia-stats-data.json file the appropriate writing permissions and open index.php from the browser. It is convenient to run the refresh.php script from time to time to update the JSON file with the global statistical data of all Wikipedias.
 
 
 
-USE
-===
+Using Wiki3DRank Calculator
+===========================
 Enter the "Q" identifiers in the text entry of the form. Multiple "Qs" separated by spaces can be added. Wait for the script to retrieve the data.
 
 The script can execute two Wiki3DRank calculation modes: fast (4-8 seconds per item) or complete (between 10-25 seconds depending on the amount of information for each item). The quick mode considers the 35 Wikipedias with the highest number of articles. The full mode uses all Wikipedias to calculate Wiki3DRank.
