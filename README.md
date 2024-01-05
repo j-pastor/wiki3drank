@@ -49,4 +49,4 @@ Authors
 
 License
 =======
-Wiki3DRAnk Calculation is distribuited under GNU General Public LIcense v3.0
+Wiki3DRAnk Calculation is available under GNU General Public LIcense v3.0
