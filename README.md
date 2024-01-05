@@ -1,4 +1,6 @@
-# Wiki3DRank Calculator
+# Wiki3DRank Calculation
+
+Wiki3DRank Calculation is a small web application that processes data obtained from Wikidata and Wikipedia to calculate a ranking of Wikidata items. It is a hybrid application developed under PHP and Python.
 
 Files
 =====
@@ -40,6 +42,9 @@ It is possible to download the data in multiple formats and export the stacked b
 Python scripts can also be run from the command line.
 
 
-LICENSE
+Authors
 =======
+Juan-Antonio Pastor-Sánchez (University of Murcia, Spain)
+Tomás Saorín (University of Murcia, Spain)
+
 Wiki3DRAnk Calculation is distribuited under GNU General Public LIcense v3.0
