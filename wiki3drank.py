@@ -52,42 +52,53 @@ values="wd:"+values
 f = open('wikipedia-stats.json')
 wikipedia_data = json.load(f)
 
-# GET NIDPROPS AND NUIDPROPS
-sparql_props='SELECT ?item ?itemLabel (COUNT(?pid) as ?nidprops) (COUNT(distinct ?pid) as ?nuidprops) WHERE {SELECT DISTINCT ?item ?pid ?o ?itemLabel WHERE {VALUES ?item {'+values+'} ?item ?pid ?o. ?prop_id wikibase:directClaim ?pid ; (wdt:P31/(wdt:P279*)) wd:Q19847637. SERVICE wikibase:label { bd:serviceParam wikibase:language "es". }}} GROUP BY ?item ?itemLabel'
-url = 'https://query.wikidata.org/bigdata/namespace/wdq/sparql'
-data = requests.get(url, params={'query': sparql_props, 'format': 'json'}).json()
+# WIKIDATA URL FOR WIKIDATA ENDPOINT
+url_wikidata_endpoint = 'https://query.wikidata.org/bigdata/namespace/wdq/sparql'
+
+# GET NPROPS, NUPROPS, NIDPROPS AND NUIDPROPS
+sparql_props='''
+    SELECT DISTINCT ?item (COUNT(?p) - ?nidprops AS ?nprops) (COUNT(DISTINCT ?p)- ?nuidprops AS ?nuprops) ?nidprops ?nuidprops WHERE {
+        VALUES ?item {'''+values+'''}
+        ?item ?p ?o. ?prop wikibase:directClaim ?p .
+        {
+            SELECT DISTINCT ?item (COUNT(DISTINCT CONCAT(STR(?o), STR(?pid))) AS ?nidprops) (COUNT(DISTINCT ?pid) AS ?nuidprops) WHERE {
+                VALUES ?item {'''+values+'''}
+                ?item ?pid ?o.
+                ?prop_id wikibase:directClaim ?pid; (wdt:P31/(wdt:P279*)) wd:Q19847637.
+            } GROUP BY ?item
+        }
+    } GROUP BY ?item ?itemLabel ?nidprops ?nuidprops'''
+data = requests.get(url_wikidata_endpoint, params={'query': sparql_props, 'format': 'json'}).json()
 for prop in data["results"]["bindings"]:
+    results_items[prop["item"]["value"].replace("http://www.wikidata.org/entity/","")]["nprops"]=int(prop["nprops"]["value"])
+    results_items[prop["item"]["value"].replace("http://www.wikidata.org/entity/","")]["nuprops"]=int(prop["nuprops"]["value"])
     results_items[prop["item"]["value"].replace("http://www.wikidata.org/entity/","")]["nidprops"]=int(prop["nidprops"]["value"])
-    results_items[prop["item"]["value"].replace("http://www.wikidata.org/entity/","")]["nuidprops"]=int(prop["nuidprops"]["value"])
-    
-# GET NPROPS AND NUPROPS
-sparql_props='SELECT DISTINCT ?item ?itemLabel (COUNT(?p) AS ?nst) (COUNT(DISTINCT ?p) AS ?nust) WHERE {VALUES ?item {'+values+'} ?item ?p ?o. ?prop wikibase:directClaim ?p.  SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }} GROUP BY ?item ?itemLabel'
-url = 'https://query.wikidata.org/bigdata/namespace/wdq/sparql'
-data = requests.get(url, params={'query': sparql_props, 'format': 'json'}).json()
-for prop in data["results"]["bindings"]:
-    results_items[prop["item"]["value"].replace("http://www.wikidata.org/entity/","")]["label_en"]=prop["itemLabel"]["value"]
-    results_items[prop["item"]["value"].replace("http://www.wikidata.org/entity/","")]["nprops"]=int(prop["nst"]["value"])-results_items[prop["item"]["value"].replace("http://www.wikidata.org/entity/","")]["nidprops"]
-    results_items[prop["item"]["value"].replace("http://www.wikidata.org/entity/","")]["nuprops"]=int(prop["nust"]["value"])-results_items[prop["item"]["value"].replace("http://www.wikidata.org/entity/","")]["nuidprops"]
+    results_items[prop["item"]["value"].replace("http://www.wikidata.org/entity/","")]["nuidprops"]=int(prop["nuidprops"]["value"])   
 
 # GET NINPROPS AND NUINPROPS
 for i in items:
     sparql_inprops='SELECT (COUNT(distinct ?subject) AS ?nuinprops) (COUNT(*) AS ?ninprops) WHERE {{SELECT ?subject WHERE {VALUES ?item {wd:'+i+'} ?subject ?p ?item. ?propiedad wikibase:directClaim ?p. } LIMIT 1000000}}'
-    url = 'https://query.wikidata.org/bigdata/namespace/wdq/sparql'
-    data = requests.get(url, params={'query': sparql_inprops, 'format': 'json'}).json()
+    data = requests.get(url_wikidata_endpoint, params={'query': sparql_inprops, 'format': 'json'}).json()
     for inprop in data["results"]["bindings"]:
         results_items[i]["ninprops"]=inprop["ninprops"]["value"]
         results_items[i]["nuinprops"]=inprop["nuinprops"]["value"]
 
-# GET SPANISH LABEL, NWIKIS AND WIKIPEDIA ARTICLES (SITELINKS)
-sparql_sitelinks='SELECT DISTINCT ?item ?itemLabel ?article WHERE {VALUES ?item {'+values+'} ?item ^schema:about ?article . FILTER (CONTAINS(str(?article),".wikipe")) SERVICE wikibase:label { bd:serviceParam wikibase:language "es". }}'
-url = 'https://query.wikidata.org/bigdata/namespace/wdq/sparql'
-data = requests.get(url, params={'query': sparql_sitelinks, 'format': 'json'}).json()
+# GET LABELS, AND WIKIPEDIA ARTICLES (SITELINKS) TO CALCULATE NLINKS
+sparql_sitelinks='''
+    SELECT DISTINCT ?item ?itemLabel_en ?itemLabel_es ?article WHERE {
+        VALUES ?item {'''+values+'''}
+        ?item ^schema:about ?article . FILTER (CONTAINS(str(?article),".wikipe"))
+        SERVICE wikibase:label { bd:serviceParam wikibase:language "es". ?item rdfs:label ?itemLabel_es.} 
+        SERVICE wikibase:label { bd:serviceParam wikibase:language "en". ?item rdfs:label ?itemLabel_en.}  
+    }'''
+data = requests.get(url_wikidata_endpoint, params={'query': sparql_sitelinks, 'format': 'json'}).json()
 for sitelink in data["results"]["bindings"]:
-    results_items[sitelink["item"]["value"].replace("http://www.wikidata.org/entity/","")]["label_es"]=sitelink["itemLabel"]["value"]
+    results_items[sitelink["item"]["value"].replace("http://www.wikidata.org/entity/","")]["label_en"]=sitelink["itemLabel_en"]["value"]
+    results_items[sitelink["item"]["value"].replace("http://www.wikidata.org/entity/","")]["label_es"]=sitelink["itemLabel_es"]["value"]
     results_items[sitelink["item"]["value"].replace("http://www.wikidata.org/entity/","")]["nwikis"]+=1
     results_items[sitelink["item"]["value"].replace("http://www.wikidata.org/entity/","")]["sitelinks"].append(sitelink["article"]["value"])
 
-# GET DATA FROM XTOOLS USING WIKIPEDIA ARTICLES
+# GET MEAN WORDS/ARTICLE FROM WIKIPEDIAS TO CALCULATE NWORDS_WM
 for i in results_items:
     n_words_wm=0
     for article in results_items[i]["sitelinks"]:
@@ -97,8 +108,8 @@ for i in results_items:
         n_words_wm+=wikipedia_data[lang]["mean"]
     results_items[i]["nwords_wm"]=n_words_wm
 
+# GET DATA FROM XTOOLS USING WIKIPEDIA ARTICLES TO CALCULATE NWORDS, NSECTIONS, NREFS, NUREFS, NLEXT, NLOUT, NLIN
 for i in results_items:
-    
     url_xtools=[]
     sitelinks_wikipedias={}
     
