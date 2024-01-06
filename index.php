@@ -126,7 +126,7 @@
 			foreach ($calculation as $item=>$item_data) {
 				echo "<label class=\"item\" for=\"".$item."\"><input type=\"checkbox\" name=\"list_delete[]\" id=\"".$item."\" value=\"".$item."\">".$item." (".$item_data["label_en"].")</label>\n";
 			} 
-			echo '<input id="button_delete" name="button_delete" type="submit" value="Delete">\n</fieldset>\n\n';
+			echo "<input id=\"button_delete\" name=\"button_delete\" type=\"submit\" value=\"Delete\">\n</fieldset>\n\n";
 		}
 	?>
 		<!-- HIDDEN FIELDS WITH RETRIEVED DATA ITEMS -->
