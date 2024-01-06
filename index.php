@@ -14,7 +14,7 @@
 	
 	$conf["wikidata_endpoint"]="https://query.wikidata.org/sparql";
 	$components=array("nwikis"=>"N<sub>Wikis</sub>","nprops"=>"N<sub>props</sub>","nuprops"=>"N<sub>uprops</sub>","ninprops"=>"N<sub>inprops</sub>",
-						"nuinprops"=>"N<sub>uinprops</sub>","nidprops"=>"N<sub>Idprops</sub>","nwords"=>"N<sub>Words</sub>",
+						"nuinprops"=>"N<sub>uinprops</sub>","nidprops"=>"N<sub>Idprops</sub>","nuidprops"=>"N<sub>Uidprops</sub>","nwords"=>"N<sub>Words</sub>",
 						"nwords_wm"=>"N<sub>Words_wm</sub>","nsections"=>"N<sub>sections</sub>","nrefs"=>"N<sub>regs</sub>",
 						"nurefs"=>"N<sub>Urefs</sub>","nlext"=>"N<sub>Lext</sub>","nlout"=>"N<sub>Lout</sub>","nlin"=>"N<sub>Lin</sub>","wiki3drank"=>"wiki3DRank");
 	

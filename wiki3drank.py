@@ -41,7 +41,7 @@ async def main_xtools(i,urls):
 # INITIALIZATION OF DICTIONARY TO STORE RETRIEVED DATA
 results_items={}
 for i in items:
-    results_items[i]={"label_en":"","label_es":"","nwikis":0,"nprops":0,"nuprops":0,"ninprops":0,"nuinprops":0,"nidprops":0,"nwords":0,"nsections":0,
+    results_items[i]={"label_en":"","label_es":"","nwikis":0,"nprops":0,"nuprops":0,"ninprops":0,"nuinprops":0,"nidprops":0, "nuidprops":0,"nwords":0,"nsections":0,
     "nrefs":0,"nurefs":0,"nwords_wm":0,"nlext":0,"nlout":0,"nlin":0,"sitelinks":[]}
 
 # FORMAT ITEMS FROM COMMAND LINE FOR SPARQL QUERIES
