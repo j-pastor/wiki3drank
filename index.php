@@ -130,7 +130,7 @@
 		}
 	?>
 		<!-- HIDDEN FIELDS WITH RETRIEVED DATA ITEMS -->
-		<input type="hidden" name="calculation_items" value='<?php echo serialize($calculation); ?>'>
+		<input type="hidden" name="calculation_items" value='<?php echo str_replace("'","&apos;",serialize($calculation)); ?>'>
 
 		<!-- CHECKBOXES TO SELECT WIKI3DRANK COMPONENTS AND COLUMNS OF DATA TABLE -->
 		<fieldset>
@@ -174,7 +174,7 @@
 			echo "</tr>\n</thead>\n<tbody>\n";
 			
 			foreach ($calculation as $item=>$item_data)  {
-				echo "<tr><td>".$item."</td><td>".$item_data["label_en"]."</td>";
+				echo "<tr><td>".$item."</td><td>".str_replace("'","&apos;",$item_data["label_en"])."</td>";
 				foreach ($total_list_components as $component) {
 					echo "<td>".round($item_data[$component],5)."</td>";
 				}
@@ -205,7 +205,7 @@
 					foreach ($_POST["list_components_wiki3drank"] as $c) {
 						$sum_components[$item]+=log(1+$item_data[$c]);
 					}
-					$trace[$number]["x"][]=$item." (".$item_data["label_en"].")";
+					$trace[$number]["x"][]=$item." (".str_replace("'","&apos;",$item_data["label_en"]).")";
 					$trace[$number]["type"]="bar";
 					$trace[$number]["y"][]=round((log(1+$item_data[$component])*$item_data["wiki3drank"])/$sum_components[$item],5);
 					$trace[$number]["name"]=$components[$component];
