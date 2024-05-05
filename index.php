@@ -13,7 +13,7 @@
 	}
 	
 	$conf["wikidata_endpoint"]="https://query.wikidata.org/sparql";
-	$components=array("nwikis"=>"N<sub>Wikis</sub>","nprops"=>"N<sub>props</sub>","nuprops"=>"N<sub>uprops</sub>","ninprops"=>"N<sub>inprops</sub>",
+	$components=array("nwikis"=>"N<sub>Wikis</sub>","nprops"=>"N<sub>Props</sub>","nuprops"=>"N<sub>uprops</sub>","ninprops"=>"N<sub>inprops</sub>",
 						"nuinprops"=>"N<sub>uinprops</sub>","nidprops"=>"N<sub>Idprops</sub>","nuidprops"=>"N<sub>Uidprops</sub>","nwords"=>"N<sub>Words</sub>",
 						"nwords_wm"=>"N<sub>Words_wm</sub>","nsections"=>"N<sub>sections</sub>","nrefs"=>"N<sub>regs</sub>",
 						"nurefs"=>"N<sub>Urefs</sub>","nlext"=>"N<sub>Lext</sub>","nlout"=>"N<sub>Lout</sub>","nlin"=>"N<sub>Lin</sub>","wiki3drank"=>"wiki3DRank");
@@ -119,7 +119,46 @@
 		}
 		$array_wiki3drank=array_column($calculation,"wiki3drank");
 		array_multisort($array_wiki3drank, SORT_DESC,$calculation);
+		
+		$clustered_components=array();
+		$maximum_components=array();
+		$aggregated_wiki3drank=0;
+		$clustered_wiki3drank=0;
+		$maximum_wiki3drank=0;
+		$tmp_wiki3drank=0;
+		$n=0;
 
+		foreach ($_POST["list_components_wiki3drank"] as $component) {
+			$maximum_components[$component]+=-10000000;
+		}
+
+
+		foreach ($calculation as $item=>$item_data) {
+			$n+=1;
+			foreach ($_POST["list_components_wiki3drank"] as $component) {
+				$clustered_components[$component]+=log(1+$item_data[$component]);
+				if (log(1+$item_data[$component])>$maximum_components[$component]) {
+					$maximum_components[$component]=log(1+$item_data[$component]);
+				}
+			}
+		}
+
+		foreach ($_POST["list_components_wiki3drank"] as $component) {
+			$aggregated_wiki3drank+=pow($clustered_components[$component],2);
+			$maximum_wiki3drank+=pow($maximum_components[$component],2);
+		}
+
+		foreach ($_POST["list_components_wiki3drank"] as $component) {
+			$clustered_components[$component]=$clustered_components[$component]/$n;
+		}
+		foreach ($_POST["list_components_wiki3drank"] as $component) {
+			$clustered_wiki3drank+=pow($clustered_components[$component],2);
+		}
+
+		$aggregated_wiki3drank=sqrt($aggregated_wiki3drank);
+		$clustered_wiki3drank=sqrt($clustered_wiki3drank);
+		$maximum_wiki3drank=sqrt($maximum_wiki3drank);
+		
 		if (sizeof($calculation)>0) {
 			echo "<fieldset><legend>Select item(s) to delete</legend>";
 		
@@ -181,6 +220,12 @@
 				echo "<td>".round($item_data["wiki3drank"],5)."</td></tr>\n";
 			}
 			echo "</tbody>\n</table>";
+
+			echo "<p><strong>Centroid Wiki3DRank:</strong> ".$clustered_wiki3drank."<br>";
+			echo "<strong>Aggregated Wiki3DRank:</strong> ".$aggregated_wiki3drank."</br>";
+			echo "<strong>Maximum Wiki3DRank:</strong> ".$maximum_wiki3drank."</p>";
+			echo "<p><small>The Centroid, Aggregated Wiki3DRank are calculated from the retrieved items and the selected components.</small></p>";
+
 		}
 	?>
 	<script type="text/javascript">
